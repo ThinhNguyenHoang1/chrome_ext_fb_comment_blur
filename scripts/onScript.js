@@ -2,12 +2,7 @@
 (() => {
     // Search for 'Comments' or 'Binh Luan' as <h2>
     const commentTermAnchors = Array.from(document.querySelectorAll("h2")).filter(ele => (ele.textContent == VI_COMMENT_TERM || ele.textContent == EN_COMMENT_TERM));
-    if (!commentTermAnchors) {
-        console.log("Cannot found anchors")
-    }
-    else {
-        console.log("ANCHORS:", commentTermAnchors)
-    }
+    console.log("ANCHORS:", commentTermAnchors)
     const commentSectionWrappers = commentTermAnchors.map((anchor) => {
         return anchor.parentNode || anchor.parentElement;
     })  
@@ -29,14 +24,19 @@
     console.log("final list:", listOfComments);
     // Test Apply Style
     const newStyles = {
-        backgroundColor: 'purple',
-        filter: 'blur(0)'
+        backgroundColor: 'blue',
+        filter: 'blur(2.5rem)'
     }
     listOfCommentList.forEach(ele => {
         Object.assign(ele.style, newStyles);
         console.log("STYLED: ", ele.style)
     });
-    console.log(COMMENT_CLASS_NAME, "index3.js")
+    const data = buildCommentIdx();
+    console.log("CRAWLED COMMENTS:", data);
+    console.log("index2.js:", defaultStyles.backgroundColor)
+    const TEST_HREF = "https://www.facebook.com/kienkhongngu.vn/posts/pfbid02V2KvWjL3MQ4bcDa9EXp8gi28tPvpgfmeKzh9R83wtWvotA19ixFTczpDFQCZneonl?comment_id=912871459808965&__tn__=R*F"
+    const testComment = getCommentDivFromHref(TEST_HREF)
+    testComment.style.backgroundColor = 'green';
     return listOfComments;
 })()
 

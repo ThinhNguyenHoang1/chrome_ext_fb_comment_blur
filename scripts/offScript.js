@@ -18,7 +18,6 @@
         console.log("wrapper:", commentSectionWrappers)
     }
     const listOfCommentList = commentSectionWrappers.map(section => section.querySelector('ul'))
-    console.log("list of comment List", listOfCommentList)
     // Flatten list of all comments on the page
     const listOfComments = listOfCommentList.reduce((acc, list) => {
         const commentList = list.querySelectorAll('li');
@@ -29,14 +28,15 @@
     console.log("final list:", listOfComments);
     // Test Apply Style
     const newStyles = {
-        backgroundColor: 'blue',
-        filter: 'blur(2.5rem)'
+        backgroundColor: 'purple',
+        filter: 'blur(0)'
     }
     listOfCommentList.forEach(ele => {
-        Object.assign(ele.style, newStyles);
-        console.log("STYLED: ", ele.style)
+        // Object.assign(ele.style, newStyles);
+        // console.log("STYLED: ", ele.style)
+        ele.style.cssText = ""
     });
-    console.log(COMMENT_CLASS_NAME, "index2.js");
+    console.log("index3.js:", defaultStyles.backgroundColor)
     return listOfComments;
 })()
 

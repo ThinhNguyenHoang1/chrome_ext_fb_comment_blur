@@ -24,15 +24,13 @@ chrome.action.onClicked.addListener(async (tab) => {
         if (nextState === 'ON') {
             await chrome.scripting.executeScript({
                 target: {tabId: currentTab.id, allFrames: true},
-                files: ["scripts/index3.js"]
+                files: ["scripts/onScript.js"]
             })
-            console.log("EXECEUTED THE BLURRING SCRIPT")
         } else if (nextState === 'OFF') {
             await chrome.scripting.executeScript({
                 target: {tabId: currentTab.id, allFrames: true},
-                files: ["scripts/index2.js"]
+                files: ["scripts/offScript.js"]
             })
-            console.log("UNDO THE BLURRING SCRIPT")
         }
     }
 });

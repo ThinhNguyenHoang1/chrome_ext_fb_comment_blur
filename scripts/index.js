@@ -7,15 +7,17 @@ const VI_COMMENT_TERM = 'Bình luận';
 const EN_COMMENT_TERM = 'Comment';
 
 const CLASS_NAMES = {
-    fb_comment: "x1n2onr6"
+    FB_COMMENT_DIV: "x1r8uery x1iyjqo2 x6ikm8r x10wlt62 x1pi30zi",
+    FB_COMMENT_TEXT_DIV: "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs",
+    FB_COMMENT_DATE_A: "x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv xi81zsa xo1l8bm"
 }
 const buildBlurStyles = (options) => {
 }
 
-// Applpy styling to the ids to elements matches the classnames 
+// Applpy styling to the ids to elements matches the classnames
 const applyStylesToClassNames = (classnames, styles) => {
     // Select the classnames
-    const elements =  document.querySelectorAll(classnames);
+    const elements = document.querySelectorAll(classnames);
     // Apply the styles
     elements.forEach((ele) => {
         ele.style = {
@@ -24,49 +26,31 @@ const applyStylesToClassNames = (classnames, styles) => {
         }
     })
 }
-// Select all comments presents on the page
-const selectAllComments = () => {
-    // Search for 'Comments' or 'Binh Luan' as <h2>
-    const commentTermAnchors = Array.from(document.querySelectorAll("h2")).filter(ele => (ele.textContent == VI_COMMENT_TERM || ele.textContent == EN_COMMENT_TERM));
-    if (!commentTermAnchors) {
-        console.log("Cannot found anchors")
-    }
-    else {
-        console.log("ANCHORS:", commentTermAnchors)
-    }
-    const commentSectionWrappers = commentTermAnchors.map((anchor) => {
-        return anchor.parentNode || anchor.parentElement;
-    })  
-    if (!commentSectionWrappers) {
-        console.log("No commentsection wrapper found");
-    }
-    else {
-        console.log("wrapper:", commentSectionWrappers)
-    }
-    const listOfCommentList = commentSectionWrappers.map(section => section.querySelector('ul'))
-    console.log("list of comment List", listOfCommentList)
-    // Flatten list of all comments on the page
-    const listOfComments = listOfCommentList.reduce((acc, list) => {
-        const commentList = list.querySelectorAll('li');
-        console.log("comment list: ", commentList)
-        acc.push(Array.from(commentList))
-        return acc
-    }, [])
-    console.log("final list:", listOfComments);
-    // Test Apply Style
-    const newStyles = {
-        backgroundColor: 'red',
-        // filter: 'blur(1.5rem)'
-    }
-    listOfCommentList.forEach(ele => {
-        Object.assign(ele.style, newStyles);
-        console.log("STYLED: ", ele.style)
-    });
-    return listOfComments;
+let defaultStyles = {}
+// Client uses these function to crawl the comments data and send to the AI model
+const getCommentHrefFromElement = (ele) => {
+    return ele.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`).href;
+}
+const buildCommentIdx = () => {
+    // Select all the comments
+    const allComments = Array.from(document.querySelectorAll(`[class="${CLASS_NAMES.FB_COMMENT_DIV}"]`));
+    return allComments.map(ele => {
+        // Sample: href="https://www.facebook.com/mew629/posts/pfbid022Fo8Zc1weinwndeLztsgqK1ginp8eYtRNKtPmsi4LaUPTuZ31otEX3jpVoawS6Yil?comment_id=806188640824780&__tn__=R*F"
+        const comment_text = ele.querySelector(`[class="${CLASS_NAMES.FB_COMMENT_TEXT_DIV}"]`).textContent;
+        const comment_href = getCommentHrefFromElement(ele);
+        return {
+            comment_text,
+            comment_href
+        }
+    })
+}
+// Quickly find back the comment by the href (from response of server)
+const getCommentDivFromHref = (href) => {
+    return document.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"][href="${href}"]`).parentElement.parentElement.parentElement;
 }
 
 // Retrieve the comments with toxic contents 
-const getToxicComments = async (comments) => {
+const getToxicComments = async (data) => {
     const endpoint = `${SERVER_ROOT_ADDR}/${API_ROUTES.PICK_TOXIC_COMMENT_FROM_LIST}`;
     const response = await fetch(endpoint);
     const jsonData = await response.json();
