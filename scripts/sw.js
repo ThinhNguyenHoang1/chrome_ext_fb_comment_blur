@@ -7,7 +7,6 @@ chrome.runtime.onInstalled.addListener(() => {
 const facebook_prefix = 'https://www.facebook.com/';
 
 chrome.action.onClicked.addListener(async (tab) => {
-
     if (tab.url.startsWith(facebook_prefix)) {
         const [currentTab] = await chrome.tabs.query({active: true, currentWindow: true});
         // We retrieve the action badge to check if the extension is 'ON' or 'OFF'

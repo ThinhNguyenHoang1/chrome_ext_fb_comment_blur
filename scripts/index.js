@@ -1,19 +1,14 @@
-const SERVER_ROOT_ADDR = "http://localhost:3000"
-const API_ROUTES = {
-    PICK_TOXIC_COMMENT_FROM_LIST: '/pick-toxic-comment/'
-}
-
-const VI_COMMENT_TERM = 'Bình luận';
-const EN_COMMENT_TERM = 'Comment';
-
 const CLASS_NAMES = {
     FB_COMMENT_DIV: "x1r8uery x1iyjqo2 x6ikm8r x10wlt62 x1pi30zi",
     FB_COMMENT_TEXT_DIV: "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs",
     FB_COMMENT_DATE_A: "x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv xi81zsa xo1l8bm"
 }
-const buildBlurStyles = (options) => {
-}
 
+// Blurred Styles 
+const blurredStyles = {
+    backgroundColor: 'blue',
+    filter: 'blur(2.5rem)'
+}
 // Applpy styling to the ids to elements matches the classnames
 const applyStylesToClassNames = (classnames, styles) => {
     // Select the classnames
@@ -49,14 +44,17 @@ const getCommentDivFromHref = (href) => {
     return document.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"][href="${href}"]`).parentElement.parentElement.parentElement;
 }
 
-// Retrieve the comments with toxic contents 
+const SERVER_ROOT_ADDR = "http://localhost:3000"
+const API_ROUTES = {
+    PICK_TOXIC_COMMENT_FROM_LIST: '/pick-toxic-comment/'
+}
+// Retrieve the comments with toxic contents
 const getToxicComments = async (data) => {
     const endpoint = `${SERVER_ROOT_ADDR}/${API_ROUTES.PICK_TOXIC_COMMENT_FROM_LIST}`;
     const response = await fetch(endpoint);
     const jsonData = await response.json();
     console.log(jsonData);
-    // TODO: Filter the IDs (class names) from the response
     return []
 }
-console.log("INITIING EXTENSION")
-const allComments = selectAllComments();
+
+let changedComments = []
