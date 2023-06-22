@@ -26,22 +26,56 @@ let defaultStyles = {}
 const getCommentHrefFromElement = (ele) => {
     return ele.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`).href;
 }
+const extractCommentIdFromHref = (href) => {
+    const url = new URL(href)
+    const params = new URLSearchParams(url.search); 
+    return params.get("comment_id");
+}
+const compactArray = (arr) => {
+    return arr.reduce(function(res, el) {
+        if(el !== null) {
+        res.push(el);//from ww  w .  ja  v  a2s.  c om
+        };
+        return res;
+    }, [])
+}
 const buildCommentIdx = () => {
     // Select all the comments
     const allComments = Array.from(document.querySelectorAll(`[class="${CLASS_NAMES.FB_COMMENT_DIV}"]`));
-    return allComments.map(ele => {
+    console.log("allComments:", allComments)
+    let data = allComments.map(ele => {
         // Sample: href="https://www.facebook.com/mew629/posts/pfbid022Fo8Zc1weinwndeLztsgqK1ginp8eYtRNKtPmsi4LaUPTuZ31otEX3jpVoawS6Yil?comment_id=806188640824780&__tn__=R*F"
-        const comment_text = ele.querySelector(`[class="${CLASS_NAMES.FB_COMMENT_TEXT_DIV}"]`).textContent;
-        const comment_href = getCommentHrefFromElement(ele);
-        return {
-            comment_text,
-            comment_href
+        const comment_text_ele = ele.querySelector(`[class="${CLASS_NAMES.FB_COMMENT_TEXT_DIV}"]`);
+        // console.log("comment text ele:", comment_text_ele)
+        if (comment_text_ele && comment_text_ele?.textContent) {
+            const comment_text = comment_text_ele.textContent;
+            const comment_href = getCommentHrefFromElement(ele);
+            const comment_id = extractCommentIdFromHref(comment_href);
+            return {
+                comment_text,
+                comment_href,
+                comment_id
+            }
         }
+        return null;
     })
+    data = compactArray(data);
+    console.log("DATA:", data);
+    return data;
 }
-// Quickly find back the comment by the href (from response of server)
+const getCommentDivFromId = (id) => {
+    const commentAnchors = Array.from(document.querySelectorAll(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`));
+    const matchingCommentAnchor = commentAnchors.find((ele) => {
+        const href = ele.href;
+        const comment_id = extractCommentIdFromHref(href);
+        return id == comment_id;
+    });
+    return matchingCommentAnchor.parentElement.parentElement.parentElement;
+}
+
 const getCommentDivFromHref = (href) => {
-    return document.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"][href="${href}"]`).parentElement.parentElement.parentElement;
+    const id = extractCommentIdFromHref(href);
+    return getCommentDivFromId(id);
 }
 
 const SERVER_ROOT_ADDR = "http://localhost:3000"
