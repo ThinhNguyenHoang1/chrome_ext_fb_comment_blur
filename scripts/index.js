@@ -9,19 +9,7 @@ const blurredStyles = {
     backgroundColor: 'blue',
     filter: 'blur(2.5rem)'
 }
-// Applpy styling to the ids to elements matches the classnames
-const applyStylesToClassNames = (classnames, styles) => {
-    // Select the classnames
-    const elements = document.querySelectorAll(classnames);
-    // Apply the styles
-    elements.forEach((ele) => {
-        ele.style = {
-            ...ele.style,
-            ...styles,
-        }
-    })
-}
-let defaultStyles = {}
+
 // Client uses these function to crawl the comments data and send to the AI model
 const getCommentHrefFromElement = (ele) => {
     return ele.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`).href;

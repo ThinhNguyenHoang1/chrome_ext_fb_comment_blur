@@ -2,7 +2,9 @@
 (() => {
     // Revert the styles back to normal
     changedComments.forEach(ele => {
-        ele.style.cssText = ""
+        const comment = getCommentDivFromId(ele['comment_id']);
+        comment.style.cssText = ""
     });
+    changedComments = []
 })()
 
