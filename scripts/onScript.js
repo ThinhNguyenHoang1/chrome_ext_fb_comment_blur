@@ -16,7 +16,8 @@
     data.forEach((ele) => {
         const testComment = getCommentDivFromIdAndRepId(ele['comment_id'], ele['rep_comment_id']);
         // console.log("TESTCOMMENT:", testComment)
-        Object.assign(testComment.style, blurredStyles);
+        // Object.assign(testComment.style, blurredStyles);
+        testComment.style.cssText = "background-color:pink;filter:blur(2.5em)"
         changedComments.push(ele)
     })
     console.log(changedComments);
