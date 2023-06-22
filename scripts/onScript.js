@@ -6,16 +6,16 @@
     console.log("COMMENT DATA:", data)
     // TODO: Send the data to the ML model to check if the comments are offensive
     // const res  = call_api(data)
-    const res = data;
+    let res = data;
 
     // TODO: Set the changedComments variable to allow redos based on the response
     changedComments = []
 
     // TODO: Apply the changes on the comment with href(s) returned from the server (sample on how to change 1 comment below)
     // ===================== TEST Change single comment =============================================================
-    res.forEach((ele) => {
-        const testComment = getCommentDivFromId(ele['comment_id']);
-        console.log("TESTCOMMENT:", testComment)
+    data.forEach((ele) => {
+        const testComment = getCommentDivFromIdAndRepId(ele['comment_id'], ele['rep_comment_id']);
+        // console.log("TESTCOMMENT:", testComment)
         Object.assign(testComment.style, blurredStyles);
         changedComments.push(ele)
     })

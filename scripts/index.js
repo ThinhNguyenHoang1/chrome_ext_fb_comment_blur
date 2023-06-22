@@ -13,11 +13,13 @@ const blurredStyles = {
 // Client uses these function to crawl the comments data and send to the AI model
 const getCommentHrefFromElement = (ele) => {
     return ele.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`).href;
-}
-const extractCommentIdFromHref = (href) => {
+} 
+const extractIdAndRepIdFromHref = (href) => {
     const url = new URL(href)
     const params = new URLSearchParams(url.search); 
-    return params.get("comment_id");
+    const commentId = params.get("comment_id"); // __
+    const repCommentId = params.get("reply_comment_id");
+    return [commentId, repCommentId];
 }
 const compactArray = (arr) => {
     return arr.reduce(function(res, el) {
@@ -38,11 +40,12 @@ const buildCommentIdx = () => {
         if (comment_text_ele && comment_text_ele?.textContent) {
             const comment_text = comment_text_ele.textContent;
             const comment_href = getCommentHrefFromElement(ele);
-            const comment_id = extractCommentIdFromHref(comment_href);
+            const [comment_id, rep_comment_id ] = extractIdAndRepIdFromHref(comment_href);
             return {
                 comment_text,
                 comment_href,
-                comment_id
+                comment_id,
+                rep_comment_id
             }
         }
         return null;
@@ -51,19 +54,19 @@ const buildCommentIdx = () => {
     console.log("DATA:", data);
     return data;
 }
-const getCommentDivFromId = (id) => {
+const getCommentDivFromIdAndRepId = (id, rep_comment_id) => {
     const commentAnchors = Array.from(document.querySelectorAll(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`));
     const matchingCommentAnchor = commentAnchors.find((ele) => {
         const href = ele.href;
-        const comment_id = extractCommentIdFromHref(href);
-        return id == comment_id;
+        const [comment_id, rep_id] = extractIdAndRepIdFromHref(href);
+        return id == comment_id && rep_comment_id == rep_id;
     });
     return matchingCommentAnchor.parentElement.parentElement.parentElement;
 }
 
 const getCommentDivFromHref = (href) => {
-    const id = extractCommentIdFromHref(href);
-    return getCommentDivFromId(id);
+    const [id, rep_id] = extractIdAndRepIdFromHref(href);
+    return getCommentDivFromIdAndRepId(id, rep_id);
 }
 
 const SERVER_ROOT_ADDR = "http://localhost:3000"
