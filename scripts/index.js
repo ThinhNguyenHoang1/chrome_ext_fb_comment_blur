@@ -14,18 +14,18 @@ const blurredStyles = {
 // Client uses these function to crawl the comments data and send to the AI model
 const getCommentHrefFromElement = (ele) => {
     return ele.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`).href;
-} 
+}
 const extractIdAndRepIdFromHref = (href) => {
     const url = new URL(href)
-    const params = new URLSearchParams(url.search); 
+    const params = new URLSearchParams(url.search);
     const commentId = params.get("comment_id"); // __
     const repCommentId = params.get("reply_comment_id");
     return [commentId, repCommentId];
 }
 const compactArray = (arr) => {
-    return arr.reduce(function(res, el) {
-        if(el !== null) {
-        res.push(el);//from ww  w .  ja  v  a2s.  c om
+    return arr.reduce(function (res, el) {
+        if (el !== null) {
+            res.push(el);//from ww  w .  ja  v  a2s.  c om
         };
         return res;
     }, [])
@@ -41,7 +41,7 @@ const buildCommentIdx = () => {
         if (comment_text_ele && comment_text_ele?.textContent) {
             const comment_text = comment_text_ele.textContent;
             const comment_href = getCommentHrefFromElement(ele);
-            const [comment_id, rep_comment_id ] = extractIdAndRepIdFromHref(comment_href);
+            const [comment_id, rep_comment_id] = extractIdAndRepIdFromHref(comment_href);
             return {
                 comment_text,
                 comment_href,
@@ -85,3 +85,50 @@ const getToxicComments = async (data) => {
 }
 
 let changedComments = []
+
+
+// Handle single message send and received
+// chrome.runtime.onMessage.addListener(
+//     (request, sender, sendResponse) => {
+//         console.log(senseer.tab ? "from a content script: " + sender.tab.url : "from extension") ; 
+//         console.log("ext received:", request)
+//         const response =  {farewell: "how are you, tab ?"};
+//         if (request.greeting === "hello") { 
+//             sendResponse(response)
+//         }
+//     }
+// )
+
+
+
+const sendMessage = (e, message = 'test') => {
+    console.log("TEST Called");
+    const sendJob = chrome.runtime.sendMessage({
+        from: 'content_script',
+        body: 'haha'
+    })
+    sendJob.then((message)  => {
+        console.log("RECEIVED A REPONSE from sw", message);
+    })
+}
+
+const registerMessageHandler = (e) => {
+    console.log("Register request handler");
+    // chrome.runtime.onMessage.addListener(
+    //     (request, sender, sendReponse) => {
+    //         console.log("Content script received a message", request)
+    //         console.log("sender:", sender)
+    //         return true;
+    //     }
+    // )
+}
+
+// chrome.runtime.onMessage.addListener(
+//     (request, sender, sendReponse) => {
+//         console.log("Contenit script received a message", request)
+//         console.log("sender:", sender)
+//         return true;
+//     }
+// )
+window.addEventListener('click', sendMessage);
+window.addEventListener('load', registerMessageHandler)
