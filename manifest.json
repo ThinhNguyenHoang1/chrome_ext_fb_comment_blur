@@ -38,5 +38,6 @@
         "mac": "Command+B"
       }
     }
-  }
+  },
+  "host_permissions": ["*://www.facebook.com/*"]
 }

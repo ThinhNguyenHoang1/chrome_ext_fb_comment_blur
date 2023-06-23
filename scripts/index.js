@@ -2,15 +2,29 @@ const CLASS_NAMES = {
     FB_COMMENT_DIV: "x1r8uery x1iyjqo2 x6ikm8r x10wlt62 x1pi30zi",
     FB_COMMENT_TEXT_DIV: "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs",
     FB_COMMENT_DATE_A: "x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv xi81zsa xo1l8bm",
-    // FB_OVERLAY: "x78zum5 xdt5ytf x1iyjqo2 x1n2onr6 x1jxyteu x1mfppf3 xqbnct6 xga75y6";
+    FB_OVERLAY: "x1n2onr6 x1ja2u2z x1afcbsf xdt5ytf x1a2a7pz x71s49j x1qjc9v5 x1qpq9i9 xdney7k xu5ydu1 xt3gfkd x78zum5 x1plvlek xryxfnj xcatxm7 xrgej4m xh8yej3",
+    FB_MAIN_CONTENT: "x9f619 x1n2onr6 x1ja2u2z"
 }
-
-// Blurred Styles 
+// .x1r8uery.x1iyjqo2.x6ikm8r.x10wlt62.x1pi30zi
+// Blurred Styles
 const blurredStyles = {
     backgroundColor: 'blue',
     filter: 'blur(2.5rem)'
 }
+// ========================= MESSAGE PASSING STUFFS =========================
+let myPort = chrome.runtime.connect({name:"facebook_blur_port"}); 
 
+const sendMessageToService = (message) => {
+    myPort.postMessage(message);
+}
+
+const handleMessage = (messageFromSw) => {
+    console.log("CONTENT_HANDLE_MESS:", messageFromSw);
+}
+
+
+
+// ========================= CONTEN SCRIPT LOGIC ================================
 // Client uses these function to crawl the comments data and send to the AI model
 const getCommentHrefFromElement = (ele) => {
     return ele.querySelector(`a[class="${CLASS_NAMES.FB_COMMENT_DATE_A}"]`).href;
@@ -85,50 +99,52 @@ const getToxicComments = async (data) => {
 }
 
 let changedComments = []
+// DOM newCommentObserver stuffs 
+const targetNode = document.querySelector(`[class="${CLASS_NAMES.FB_MAIN_CONTENT}"]`);
 
-
-// Handle single message send and received
-// chrome.runtime.onMessage.addListener(
-//     (request, sender, sendResponse) => {
-//         console.log(senseer.tab ? "from a content script: " + sender.tab.url : "from extension") ; 
-//         console.log("ext received:", request)
-//         const response =  {farewell: "how are you, tab ?"};
-//         if (request.greeting === "hello") { 
-//             sendResponse(response)
-//         }
-//     }
-// )
+const config = { attributes: true, childList: true, subtree: true }
+let commentNum = -1;
 
 
 
-const sendMessage = (e, message = 'test') => {
-    console.log("TEST Called");
-    const sendJob = chrome.runtime.sendMessage({
-        from: 'content_script',
-        body: 'haha'
-    })
-    sendJob.then((message)  => {
-        console.log("RECEIVED A REPONSE from sw", message);
-    })
+const handleNumCommentChange = () => {
+    const message = {
+        from: 'facebook_tab',
+        body: 'new_comment_added'
+    }
+    sendMessageToService(message)
 }
 
-const registerMessageHandler = (e) => {
-    console.log("Register request handler");
-    // chrome.runtime.onMessage.addListener(
-    //     (request, sender, sendReponse) => {
-    //         console.log("Content script received a message", request)
-    //         console.log("sender:", sender)
-    //         return true;
-    //     }
-    // )
+const checkNewCommentsAppear = (mutationList, newCommentObserver) => {
+    const isCommentNode = (node) => {
+        console.log("CLASS NAME: ", node.className)
+        return node.className === CLASS_NAMES.FB_COMMENT_DIV;
+    }
+    const allComments = Array.from(document.querySelectorAll(`[class="${CLASS_NAMES.FB_COMMENT_DIV}"]`));
+    if (allComments.length !== commentNum) {
+        commentNum = allComments.length;
+        console.log("NUM COMMENTS CHANGES");
+        handleNumCommentChange();
+    }
 }
 
-// chrome.runtime.onMessage.addListener(
-//     (request, sender, sendReponse) => {
-//         console.log("Contenit script received a message", request)
-//         console.log("sender:", sender)
-//         return true;
-//     }
-// )
-window.addEventListener('click', sendMessage);
-window.addEventListener('load', registerMessageHandler)
+const newCommentObserver = new MutationObserver(checkNewCommentsAppear);
+// ========================== Document lifecycle handing ======================
+const setUpScript = (e) => {
+    // Register the listenner
+    newCommentObserver.observe(targetNode, config);
+    myPort.onMessage.addListener(handleMessage)
+}
+
+const tearDownScript = (e) => {
+    // Undo the stuffs: remove the listener(S)
+    newCommentObserver.disconnect();
+}
+
+// ========================== Document lifecycle ===============================
+window.addEventListener('load', setUpScript)
+window.addEventListener('unload', tearDownScript)
+window.addEventListener('click', () => {
+    const testMess = {greeting: 'haahah'};
+    sendMessageToService(testMess)
+})
