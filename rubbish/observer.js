@@ -56,3 +56,10 @@ var observeDOM = (function(){
      listElm.removeChild(listElm.lastElementChild);
      listElm.insertAdjacentHTML("beforeend", Array(4).join(itemHTML));
   }, 3000);
+
+
+  window.addEventListener('load', () => {
+    const pEle = document.querySelector('#test_p');
+    console.log("BLUR");
+    // pEle.style.cssText = "background-color:pink;filter:blur(2.5em)";
+  })
