@@ -1,11 +1,12 @@
 const CLASS_NAMES = {
     // Comment with text (not inclusive of comments with images or emoji)
     FB_COMMENT_DIV: "x1r8uery x1iyjqo2 x6ikm8r x10wlt62 x1pi30zi",
-    //x1r8uery x1iyjqo2 x6ikm8r x10wlt62 x1pi30zi 
+    //x1r8uery x1iyjqo2 x6ikm8r x10wlt62 x1pi30zi  
     FB_COMMENT_TEXT_DIV: "xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs",
     FB_COMMENT_DATE_A: "x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv xi81zsa xo1l8bm",
     FB_OVERLAY: "x1n2onr6 x1ja2u2z x1afcbsf xdt5ytf x1a2a7pz x71s49j x1qjc9v5 x1qpq9i9 xdney7k xu5ydu1 xt3gfkd x78zum5 x1plvlek xryxfnj xcatxm7 xrgej4m xh8yej3",
-    FB_MAIN_CONTENT: "x9f619 x1n2onr6 x1ja2u2z"
+    FB_MAIN_CONTENT: "x9f619 x1n2onr6 x1ja2u2z",
+    FB_COMMENT_TEXT: "x9f619 x1n2onr6 x1ja2u2z",
 }
 // .x1r8uery.x1iyjqo2.x6ikm8r.x10wlt62.x1pi30zi
 // Blurred Styles
@@ -23,7 +24,6 @@ const sendMessageToService = (message) => {
 const handleMessage = (messageFromSw) => {
     console.log("CONTENT_HANDLE_MESS:", messageFromSw);
 }
-
 
 
 // ========================= CONTEN SCRIPT LOGIC ================================
@@ -80,7 +80,7 @@ const getCommentDivFromIdAndRepId = (id, rep_comment_id) => {
         return id == comment_id && rep_comment_id == rep_id;
     });
     // return matchingCommentAnchors.parentElement.parentElement.parentElement;
-    return matchingCommentAnchors.map((ele) => (ele.parentElement.parentElement.parentElement))
+    return matchingCommentAnchors.map((ele) => (ele.parentElement.parentElement.parentElement.parentElement))
 
 }
 
@@ -89,7 +89,7 @@ const getCommentDivFromHref = (href) => {
     return getCommentDivFromIdAndRepId(id, rep_id);
 }
 
-const SERVER_ROOT_ADDR = "http://localhost:3000"
+const SERVER_ROOT_ADDR = "https://foxhound-intimate-oriole.ngrok-free.app/"
 const API_ROUTES = {
     PICK_TOXIC_COMMENT_FROM_LIST: '/pick-toxic-comment/'
 }
@@ -149,7 +149,13 @@ const tearDownScript = (e) => {
 // ========================== Document lifecycle ===============================
 window.addEventListener('load', setUpScript)
 window.addEventListener('unload', tearDownScript)
-window.addEventListener('click', () => {
-    const testMess = {greeting: 'haahah'};
-    sendMessageToService(testMess)
-})
+// window.addEventListener('click', () => {
+//     const testMess = {greeting: 'haahah'};
+//     sendMessageToService(testMess)
+// })
+// ========================== REPEAT SEND MESS TO SW AFTER 25 SECONDS TO KEEP SW ALIVE =======================
+// setInterval(() => {     
+//     const testMess = {greeting: 'alive'};
+//     sendMessageToService(testMess)
+//     chrome.runtime.sendMessage(testMess);
+// }   , 25000);

@@ -1,9 +1,25 @@
 let portFromCS;
 
 // ========================= COMMUNICATIACTIVE STUFF =====================
+
 const registerMessageHandler = (handler) => {
     portFromCS.onMessage.addListener(handler)
 }
+
+function onConnectHandler(p){
+    portFromCS = p;
+    console.log("CACTIVENECTED TO PORT:", portFromCS)
+    // Register handler
+    registerMessageHandler(handleMessage)
+}
+chrome.runtime.onConnect.addListener(onConnectHandler);
+
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.action.setBadgeText({
+        text: 'ACTIVE'
+    });
+});
+
 
 const sendMessage = (mess) => {
     portFromCS.postMessage(mess)
@@ -30,16 +46,3 @@ const handleMessage = async (messFromCS, port) => {
     }
 }
 
-function onConnectHandler(p){
-    portFromCS = p;
-    console.log("CACTIVENECTED TO PORT:", portFromCS)
-    // Register handler
-    registerMessageHandler(handleMessage)
-}
-chrome.runtime.onConnect.addListener(onConnectHandler);
-
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.action.setBadgeText({
-        text: 'ACTIVE'
-    });
-});
