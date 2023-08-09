@@ -2,15 +2,22 @@ const button_blur = document.querySelector("#blur");
 const level_input = document.getElementsByName("level");
 
 const facebook_prefix = "https://www.facebook.com/";
-let isBlur = true;
+let isBlur;
 let checkValue;
+
+chrome.storage.local.set({ isBlur: isBlur }).then(async () => {
+  await chrome.storage.local.get(["isBlur"]).then((result) => {
+    if (result.isBlur == undefined) {
+      isBlur = true;
+    } else {
+      isBlur = result.isBlur;
+    }
+  });
+});
+
 chrome.storage.local.set({ levelValue: checkValue }).then(async () => {
   await chrome.storage.local.get(["levelValue"]).then((result) => {
-    if (checkValue == undefined) {
-      checkValue = "0.6";
-    } else {
-      checkValue = result.levelValue;
-    }
+    checkValue = result.levelValue ? result.levelValue : "0.6";
   });
   level_input.forEach((ele) => {
     checkValue == ele.value ? (ele.checked = true) : (ele.checked = false);
@@ -50,13 +57,14 @@ level_input.forEach((ele) => {
 });
 
 button_blur.addEventListener("click", async () => {
-  console.log("button clicked");
   const [currentTab] = await chrome.tabs.query({
     active: true,
     currentWindow: true,
   });
-  button_blur.textContent = isBlur ? "INACTIVE" : "ACTIVE";
+  // button_blur.textContent = isBlur ? "INACTIVE" : "ACTIVE";
+  console.log("button clicked", isBlur);
   isBlur = !isBlur;
+
   if (currentTab.url.startsWith(facebook_prefix)) {
     // Next state will always be the opposite
     const nextState = isBlur ? "ACTIVE" : "INACTIVE";
@@ -77,4 +85,7 @@ button_blur.addEventListener("click", async () => {
       });
     }
   }
+  chrome.storage.local.set({ isBlur: isBlur }).then(() => {
+    
+  });
 });

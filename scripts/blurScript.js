@@ -20,33 +20,34 @@
     console.log("Value currently is " + level);
   });
 
-
   // TODO: Send the data to the ML model to check if the comments are offensive
   // const res  = call_api(data)
   let res = data;
   // TODO: Set the changedComments variable to allow redos based on the response
   changedComments = [];
 
-
   let predict_results;
   var formdata = new FormData();
-  
+
   data.forEach((ele) => {
     formdata.append("comments", ele["comment_text"]);
   });
   var requestOptions = {
-    method: 'POST',
+    method: "POST",
     body: formdata,
-    redirect: 'follow'
+    redirect: "follow",
   };
 
-  await fetch("https://foxhound-intimate-oriole.ngrok-free.app/api/detect/", requestOptions)
-    .then(response => response.text())
-    .then(result => {
+  await fetch(
+    "https://foxhound-intimate-oriole.ngrok-free.app/api/detect/",
+    requestOptions
+  )
+    .then((response) => response.text())
+    .then((result) => {
       predict_results = JSON.parse(result);
       console.log("predict_results:", predict_results);
     })
-    .catch(error => console.log('error', error));
+    .catch((error) => console.log("error", error));
   console.log("predict_results:", predict_results);
 
   res.forEach((ele, index) => {
@@ -58,39 +59,26 @@
   console.log("xxxxxxxx", changedComments);
   // check res in api
 
-
   // TODO: Apply the changes on the comment with href(s) returned from the server (sample on how to change 1 comment below)
   changedComments.forEach((ele) => {
     const testComments = getCommentDivFromIdAndRepId(
       ele["comment_id"],
       ele["rep_comment_id"]
     );
+    // testComments.forEach(
+    //   (comment) =>
+    //     {
+    // console.log("comment:", comment);
+    // let commentText = comment.getElementsByClassName("x1lliihq xjkvuk6 x1iorvi4")[0];
+    // console.log("commentText:", commentText);
+    // commentText.style.cssText = "background-color:pink;filter:blur(2.5em)";
+    //     }
+    // );
     testComments.forEach(
       (comment) =>
-        {
-          // console.log("comment:", comment);
-          let commentText = comment.getElementsByClassName("x1lliihq xjkvuk6 x1iorvi4")[0];
-          // console.log("commentText:", commentText);
-          commentText.style.cssText = "background-color:pink;filter:blur(2.5em)";
-        }
+        (comment.style.cssText = "background-color:pink;filter:blur(2.5em)")
     );
-    // testComment.style.cssText = "background-color:pink;filter:blur(2.5em)"
-    });
-  // changedComments.forEach((ele) => {
-  //   const testComments = getCommentDivFromIdAndRepId(
-  //     ele["comment_id"],
-  //     ele["rep_comment_id"]
-  //   );
-    
-  //   testComments.forEach(
-  //     (comment) =>
-      
-  //       (comment.querySelectorAll("xdj266r x11i5rnm xat24cr x1mh8g0r x1vvkbs")[0].style.cssText = "background-color:pink;filter:blur(2.5em)")
-  //   );
-  //   changedComments.push(ele);
-  // });
-
-
+  });
 
   // ===================== TEST Change single comment =============================================================
   // data.forEach((ele) => {
@@ -111,9 +99,10 @@
 })();
 
 function checkIsToxic(predict_result, level) {
+  let tempLevel = level == undefined ? 0.6 : level;
   let predictions = predict_result["prediction"];
   for ([key, value] of Object.entries(predictions)) {
-    if (value > level) {
+    if (value > tempLevel) {
       return true;
     }
   }
